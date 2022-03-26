@@ -73,4 +73,7 @@ public class GameManager : MonoBehaviour {
     public Vector3 WorldPos(Vector3Int gridPos) {
         return map.CellToWorld(gridPos);
     }
+    public bool HasTile(Vector3Int gridPos) {
+        return map.HasTile(gridPos);
+    }
 }
