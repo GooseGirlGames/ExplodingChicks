@@ -4,5 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class Basic : PlayerController {
-
+    public override string GetName() {
+        return "Basic";
+    }
 }
