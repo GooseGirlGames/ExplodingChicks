@@ -37,10 +37,17 @@ public class GameManager : MonoBehaviour {
     }
 
     public Vector3Int CellUnderPointer() {
-        var pointerWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int pointer = map.WorldToCell(pointerWorld);
-        pointer.z = 0;
-        return pointer;
+
+        Plane ground = new Plane(Vector3.up, 0);  // grid is on here
+        float distance;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (ground.Raycast(ray, out distance)) {
+            var pointerWorld = ray.GetPoint(distance);
+            Vector3Int pointer = map.WorldToCell(pointerWorld);
+            pointer.z = 0;
+            return pointer;
+        }
+        return Vector3Int.zero;  // meh
     }
 
     private void ClearHighlightedTiles() {
@@ -100,7 +107,7 @@ public class GameManager : MonoBehaviour {
         //activePlayer = p;
         playerControllers.Add(p);
         int id = playerControllers.FindIndex(o => o == p);
-        Debug.Log("Registered Player #" + id + " of type " + p.GetName());
+        Debug.Log("Registered Player #" + id + " of type " + p.GetName() + " at " + p.GridPos());
         HighlightCells(Vector3Int.zero);
         return id;
     }
