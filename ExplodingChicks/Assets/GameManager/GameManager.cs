@@ -15,24 +15,38 @@ public class GameManager : MonoBehaviour {
 
     
     private List<Vector3Int> highlightedTiles = new List<Vector3Int>();
-    private void MouseLook() {
-        var pointerWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int pointer = map.WorldToCell(pointerWorld);
-        pointer.z = 0;
+    private void HighlightCells(Vector3Int pointer) {
 
         if (highlightedTiles.Contains(pointer)) {
-            return;
+            //return;
         }
         ClearHighlightedTiles();
 
         if (!activePlayer.CanMove(pointer)) {
-            return;
+            //return;
+        }
+
+
+        var bounds = map.cellBounds;
+        foreach (var pos in bounds.allPositionsWithin) {
+            if (activePlayer.CanMove(pos)) {
+                map.SetTileFlags(pos, TileFlags.None);
+                map.SetColor(pos, Color.green);
+            }
+            highlightedTiles.Add(pos);
         }
 
         map.SetTileFlags(pointer, TileFlags.None);
         map.SetColor(pointer, Color.blue);
-
         highlightedTiles.Add(pointer);
+
+    }
+
+    public Vector3Int CellUnderPointer() {
+        var pointerWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3Int pointer = map.WorldToCell(pointerWorld);
+        pointer.z = 0;
+        return pointer;
     }
 
     private void ClearHighlightedTiles() {
@@ -53,10 +67,12 @@ public class GameManager : MonoBehaviour {
     }
 
     void Update() {
-        MouseLook();
-        if (Input.GetButtonDown("Fire1") && highlightedTiles.Count > 0) {
+        var pointer = CellUnderPointer();
+        HighlightCells(pointer);
+        
+        if (Input.GetButtonDown("Fire1") && activePlayer.CanMove(pointer)) {
             Debug.Log("Turn #" + turn);
-            activePlayer.SetGridPos(highlightedTiles[0]);
+            activePlayer.SetGridPos(pointer);
             ClearHighlightedTiles();
 
             ++turn;
@@ -67,7 +83,8 @@ public class GameManager : MonoBehaviour {
         activePlayer = p;
         playerControllers.Add(p);
         int id = playerControllers.FindIndex(o => o == p);
-        Debug.Log("Registered Player #" + id);
+        Debug.Log("Registered Player #" + id + " of type " + p.GetName());
+        HighlightCells(Vector3Int.zero);
         return id;
     }
 

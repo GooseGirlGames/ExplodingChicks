@@ -6,9 +6,10 @@ using UnityEngine.Tilemaps;
 public abstract class PlayerController : MonoBehaviour {
     
     private int id = -1;
+    public abstract string GetName();
 
 
-    void Start() {
+    void Awake() {
         id = GameManager.Instance.RegisterPlayer(this);
         AlignToGrid();
     }
