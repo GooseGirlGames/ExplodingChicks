@@ -1,15 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+
+
 public class GameManager : MonoBehaviour {
+    [Serializable]
+    public struct Tile {
+        public Sprite sprite;  // 2D
+        public GameObject prefab;  // 3D
+    }
+
     public static GameManager Instance = null;
 
     [SerializeField]
     private Tilemap map;
     [SerializeField]
-    private GameObject tilePrefab;
+    private List<Tile> tiles = new List<Tile>();
 
     private List<PlayerController> playerControllers = new List<PlayerController>();
     private PlayerController activePlayer = null;
@@ -65,15 +74,27 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        map.GetComponent<TilemapRenderer>().enabled = false;
+        //map.GetComponent<TilemapRenderer>().enabled = false;
         var bounds = map.cellBounds;
         foreach (var pos in bounds.allPositionsWithin) {
-            if (map.HasTile(pos)) {
-                var b = GameObject.Instantiate(tilePrefab, WorldPos(pos), Quaternion.identity, map.transform);
-                b.transform.localScale = Vector3.one / 1.6f;
+            if (!map.HasTile(pos)) {
+                continue;
             }
+
+            Sprite sprite = map.GetSprite(pos);
+            GameObject prefab = Get3DTile(sprite);
+
+            var b = GameObject.Instantiate(prefab, WorldPos(pos), Quaternion.identity, map.transform);
+            b.transform.localScale = Vector3.one / 1.6f;
+            b.transform.position += new Vector3(0, -1, 0);
         }
     }
+
+    private GameObject Get3DTile(Sprite sprite) {
+        Tile tile = tiles.Find(t => t.sprite == sprite);
+        return tile.prefab;
+    }
+
     void Start() {
         
     }
