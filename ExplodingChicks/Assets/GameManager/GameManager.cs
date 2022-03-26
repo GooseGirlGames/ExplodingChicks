@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour {
 
     [SerializeField]
     private Tilemap map;
+    [SerializeField]
+    private GameObject tilePrefab;
 
     private List<PlayerController> playerControllers = new List<PlayerController>();
     private PlayerController activePlayer = null;
@@ -61,6 +63,15 @@ public class GameManager : MonoBehaviour {
     private void Awake() {
         if (Instance == null) {
             Instance = this;
+        }
+
+        map.GetComponent<TilemapRenderer>().enabled = false;
+        var bounds = map.cellBounds;
+        foreach (var pos in bounds.allPositionsWithin) {
+            if (map.HasTile(pos)) {
+                var b = GameObject.Instantiate(tilePrefab, WorldPos(pos), Quaternion.identity, map.transform);
+                b.transform.localScale = Vector3.one / 1.6f;
+            }
         }
     }
     void Start() {
