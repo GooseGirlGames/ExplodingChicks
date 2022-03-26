@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour {
 
     public bool CanMove(Vector3Int target) {
         var dist = Vector3Int.Distance(target, GridPos());
-        return dist > 0 && dist < 1.5;
+        return dist > 0 && dist < 1.5 && GameManager.Instance.HasTile(target);
     }
 
     public Vector3Int GridPos() {
