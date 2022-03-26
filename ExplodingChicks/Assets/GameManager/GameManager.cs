@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
 
     private List<PlayerController> playerControllers = new List<PlayerController>();
     private PlayerController activePlayer = null;
+    private int turn = 0;
 
     
     private List<Vector3Int> highlightedTiles = new List<Vector3Int>();
@@ -54,8 +55,11 @@ public class GameManager : MonoBehaviour {
     void Update() {
         MouseLook();
         if (Input.GetButtonDown("Fire1") && highlightedTiles.Count > 0) {
+            Debug.Log("Turn #" + turn);
             activePlayer.SetGridPos(highlightedTiles[0]);
             ClearHighlightedTiles();
+
+            ++turn;
         }
     }
 
