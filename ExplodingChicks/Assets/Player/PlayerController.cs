@@ -6,8 +6,10 @@ using UnityEngine.Tilemaps;
 public abstract class PlayerController : MonoBehaviour {
     
     private int id = -1;
+    private Vector3Int? nextPosition = null;
     public abstract string GetName();
-
+    public abstract bool CanMove(Vector3Int target);
+    public abstract bool LastTurn();
 
     void Awake() {
         id = GameManager.Instance.RegisterPlayer(this);
@@ -15,12 +17,7 @@ public abstract class PlayerController : MonoBehaviour {
     }
 
 
-    public virtual bool CanMove(Vector3Int target) {
-        var dist = Vector3Int.Distance(target, GridPos());
-
-        return dist > 0 && dist < 1.5 && GameManager.Instance.HasTile(target);
-    }
-
+    
     public Vector3Int GridPos() {
         return GameManager.Instance.GridPos(transform.position);
     }
@@ -31,6 +28,16 @@ public abstract class PlayerController : MonoBehaviour {
     private void AlignToGrid() {
         var pos = GridPos();
         SetGridPos(pos);
+    }
+
+    public void SetNextPos(Vector3Int? pos) {
+        nextPosition = pos;
+    }
+    public void Move() {
+        if (nextPosition is Vector3Int pos) {
+            // TODO interaction & stuff
+            SetGridPos(pos);
+        }
     }
 
 }

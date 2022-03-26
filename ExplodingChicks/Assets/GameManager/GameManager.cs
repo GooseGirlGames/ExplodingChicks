@@ -12,24 +12,18 @@ public class GameManager : MonoBehaviour {
     private List<PlayerController> playerControllers = new List<PlayerController>();
     private PlayerController activePlayer = null;
     private int turn = 0;
-
     
     private List<Vector3Int> highlightedTiles = new List<Vector3Int>();
     private void HighlightCells(Vector3Int pointer) {
-
-        if (highlightedTiles.Contains(pointer)) {
-            //return;
-        }
         ClearHighlightedTiles();
 
-        if (!activePlayer.CanMove(pointer)) {
-            //return;
+        if (activePlayer == null) {
+            return;
         }
-
 
         var bounds = map.cellBounds;
         foreach (var pos in bounds.allPositionsWithin) {
-            if (activePlayer.CanMove(pos)) {
+            if (activePlayer != null &&activePlayer.CanMove(pos)) {
                 map.SetTileFlags(pos, TileFlags.None);
                 map.SetColor(pos, Color.green);
             }
@@ -68,19 +62,42 @@ public class GameManager : MonoBehaviour {
 
     void Update() {
         var pointer = CellUnderPointer();
-        HighlightCells(pointer);
-        
-        if (Input.GetButtonDown("Fire1") && activePlayer.CanMove(pointer)) {
-            Debug.Log("Turn #" + turn);
-            activePlayer.SetGridPos(pointer);
-            ClearHighlightedTiles();
 
-            ++turn;
+        if (Input.GetButtonDown("Fire1")) {
+            ClearHighlightedTiles();
+                
+            if (activePlayer != null && activePlayer.GridPos() == pointer) {
+                activePlayer = null;
+            } else if (activePlayer == null) {
+                foreach (PlayerController p in playerControllers) {
+                    if (p.GridPos() == pointer) {
+                        activePlayer = p;
+                    }
+                }
+            } else if (activePlayer.CanMove(pointer)) {
+                activePlayer.SetNextPos(pointer);
+                activePlayer = null;
+            }
+
+            HighlightCells(pointer);
+        }
+        
+
+
+        if (Input.GetButtonDown("Jump")) {
+            foreach (PlayerController p in playerControllers) {
+                p.Move();
+                p.SetNextPos(null);
+            }
         }
     }
 
+    private void SpawnNewPlayer() {
+        
+    } 
+
     public int RegisterPlayer(PlayerController p) {
-        activePlayer = p;
+        //activePlayer = p;
         playerControllers.Add(p);
         int id = playerControllers.FindIndex(o => o == p);
         Debug.Log("Registered Player #" + id + " of type " + p.GetName());
@@ -96,5 +113,8 @@ public class GameManager : MonoBehaviour {
     }
     public bool HasTile(Vector3Int gridPos) {
         return map.HasTile(gridPos);
+    }
+    public int CurrentTurn() {
+        return turn;
     }
 }
