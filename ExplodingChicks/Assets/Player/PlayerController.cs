@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class PlayerController : MonoBehaviour {
+public abstract class PlayerController : MonoBehaviour {
     
     private int id = -1;
 
@@ -14,8 +14,9 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-    public bool CanMove(Vector3Int target) {
+    public virtual bool CanMove(Vector3Int target) {
         var dist = Vector3Int.Distance(target, GridPos());
+
         return dist > 0 && dist < 1.5 && GameManager.Instance.HasTile(target);
     }
 
