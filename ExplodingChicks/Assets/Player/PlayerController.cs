@@ -18,8 +18,9 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         MouseLook();
-        if (Input.GetButtonDown("Fire1")) {
+        if (Input.GetButtonDown("Fire1") && coloredTiles.Count > 0) {
             transform.position = map.CellToWorld(coloredTiles[0]);
+            ClearColoredTiles();
         }
     }
 
@@ -31,18 +32,16 @@ public class PlayerController : MonoBehaviour {
         if (coloredTiles.Contains(pointer)) {
             return;
         }
+        ClearColoredTiles();
 
-        if (Vector3Int.Distance(pointer, GridPos()) > 1) {
+        var dist = Vector3Int.Distance(pointer, GridPos());
+        if (dist == 0 || dist > 1.5) {
             return;
         }
 
         map.SetTileFlags(pointer, TileFlags.None);
         map.SetColor(pointer, Color.blue);
 
-        foreach (var pos in coloredTiles) {
-            map.SetColor(pos, Color.white);
-        }
-        coloredTiles.Clear();
         coloredTiles.Add(pointer);
     }
 
@@ -56,5 +55,12 @@ public class PlayerController : MonoBehaviour {
     private void AlignToGrid() {
         var pos = GridPos();
         SetGridPos(pos);
+    }
+
+    private void ClearColoredTiles() {
+        foreach (var pos in coloredTiles) {
+            map.SetColor(pos, Color.white);
+        }
+        coloredTiles.Clear();
     }
 }
