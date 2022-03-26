@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Rook : PlayerController {
+public class Rook : Basic {
     public override string GetName() {
         return "Rook";
     }

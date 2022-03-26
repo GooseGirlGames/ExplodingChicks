@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Horse : PlayerController {
+public class Horse : Basic {
     public override string GetName() {
         return "Horse";
     }
