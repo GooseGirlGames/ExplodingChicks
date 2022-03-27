@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        //map.GetComponent<TilemapRenderer>().enabled = false;
+        map.GetComponent<TilemapRenderer>().enabled = false;
         var bounds = map.cellBounds;
         foreach (var pos in bounds.allPositionsWithin) {
             if (!map.HasTile(pos)) {
@@ -84,9 +84,9 @@ public class GameManager : MonoBehaviour {
             Sprite sprite = map.GetSprite(pos);
             GameObject prefab = Get3DTile(sprite);
 
-            var b = GameObject.Instantiate(prefab, WorldPos(pos), Quaternion.identity, map.transform);
+            var b = GameObject.Instantiate(prefab, WorldPos(pos), Quaternion.identity);
             b.transform.localScale = Vector3.one / 1.6f;
-            b.transform.position += new Vector3(0, -1, 0);
+            b.transform.position -= new Vector3(-0.5f, 0.60f, -0.5f);
         }
     }
 
