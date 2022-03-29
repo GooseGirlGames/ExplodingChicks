@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public static GameManager Instance = null;
+    public const float DEBUG_HCI_ALPHA = 0.6f;
 
     [SerializeField]
     private Tilemap map;
@@ -35,14 +36,12 @@ public class GameManager : MonoBehaviour {
         var bounds = map.cellBounds;
         foreach (var pos in bounds.allPositionsWithin) {
             if (activePlayer != null &&activePlayer.CanMove(pos)) {
-                map.SetTileFlags(pos, TileFlags.None);
-                map.SetColor(pos, Color.green);
+                map.SetColor(pos, Color.green - new Color(0, 0, 0, DEBUG_HCI_ALPHA));
             }
             highlightedTiles.Add(pos);
         }
 
-        map.SetTileFlags(pointer, TileFlags.None);
-        map.SetColor(pointer, Color.blue);
+        map.SetColor(pointer, Color.blue - new Color(0, 0, 0, DEBUG_HCI_ALPHA));
         highlightedTiles.Add(pointer);
 
     }
@@ -63,7 +62,7 @@ public class GameManager : MonoBehaviour {
 
     private void ClearHighlightedTiles() {
         foreach (var pos in highlightedTiles) {
-            map.SetColor(pos, Color.white);
+            map.SetColor(pos, Color.clear);
         }
         highlightedTiles.Clear();
     }
@@ -74,12 +73,17 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        map.GetComponent<TilemapRenderer>().enabled = false;
+        //map.GetComponent<TilemapRenderer>().enabled = false;
+
         var bounds = map.cellBounds;
         foreach (var pos in bounds.allPositionsWithin) {
+
             if (!map.HasTile(pos)) {
                 continue;
             }
+
+            map.SetTileFlags(pos, TileFlags.None);
+            map.SetColor(pos, Color.clear);
 
             Sprite sprite = map.GetSprite(pos);
             GameObject prefab = Get3DTile(sprite);
@@ -88,15 +92,15 @@ public class GameManager : MonoBehaviour {
             b.transform.localScale = Vector3.one / 1.6f;
             b.transform.position -= new Vector3(-0.5f, 0.60f, -0.5f);
         }
+
+
+        map.transform.Translate(Vector3.up * 0.2f);
     }
+
 
     private GameObject Get3DTile(Sprite sprite) {
         Tile tile = tiles.Find(t => t.sprite == sprite);
         return tile.prefab;
-    }
-
-    void Start() {
-        
     }
 
     void Update() {
@@ -120,8 +124,6 @@ public class GameManager : MonoBehaviour {
 
             HighlightCells(pointer);
         }
-        
-
 
         if (Input.GetButtonDown("Jump")) {
             foreach (PlayerController p in playerControllers) {
